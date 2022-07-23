@@ -1,177 +1,200 @@
-/*
- * GLUT Shapes Demo
- *
- * Written by Nigel Stewart November 2003
- *
- * This program is test harness for the sphere, cone
- * and torus shapes in GLUT.
- *
- * Spinning wireframe and smooth shaded shapes are
- * displayed until the ESC or q key is pressed.  The
- * number of geometry stacks and slices can be adjusted
- * using the + and - keys.
- */
-
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
+#include <windows.h>
 #include <GL/glut.h>
-#endif
 
-#include <stdlib.h>
 
-static int slices = 16;
-static int stacks = 16;
+#include "draw.h"
 
-/* GLUT callback Handlers */
+GLfloat position = 0.0;
+GLfloat speed = 0.1;
 
-static void resize(int width, int height)
+void update (int value)
 {
-    const float ar = (float) width / (float) height;
+    if (position < -2)
+        position = 1.0f;
 
-    glViewport(0, 0, width, height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity() ;
-}
-
-static void display(void)
-{
-    const double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
-    const double a = t*90.0;
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glColor3d(1,0,0);
-
-    glPushMatrix();
-        glTranslated(-2.4,1.2,-6);
-        glRotated(60,1,0,0);
-        glRotated(a,0,0,1);
-        glutSolidSphere(1,slices,stacks);
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslated(0,1.2,-6);
-        glRotated(60,1,0,0);
-        glRotated(a,0,0,1);
-        glutSolidCone(1,1,slices,stacks);
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslated(2.4,1.2,-6);
-        glRotated(60,1,0,0);
-        glRotated(a,0,0,1);
-        glutSolidTorus(0.2,0.8,slices,stacks);
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslated(-2.4,-1.2,-6);
-        glRotated(60,1,0,0);
-        glRotated(a,0,0,1);
-        glutWireSphere(1,slices,stacks);
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslated(0,-1.2,-6);
-        glRotated(60,1,0,0);
-        glRotated(a,0,0,1);
-        glutWireCone(1,1,slices,stacks);
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslated(2.4,-1.2,-6);
-        glRotated(60,1,0,0);
-        glRotated(a,0,0,1);
-        glutWireTorus(0.2,0.8,slices,stacks);
-    glPopMatrix();
-
-    glutSwapBuffers();
-}
-
-
-static void key(unsigned char key, int x, int y)
-{
-    switch (key)
-    {
-        case 27 :
-        case 'q':
-            exit(0);
-            break;
-
-        case '+':
-            slices++;
-            stacks++;
-            break;
-
-        case '-':
-            if (slices>3 && stacks>3)
-            {
-                slices--;
-                stacks--;
-            }
-            break;
-    }
+    position -= speed;
 
     glutPostRedisplay();
+    glutTimerFunc(100, update, 0);
 }
 
-static void idle(void)
+
+
+void init()
 {
-    glutPostRedisplay();
+    glClearColor(0.0, 0.0, 0.0, 1.0);
 }
 
-const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
-const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-const GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
 
-const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
-const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
-const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
-const GLfloat high_shininess[] = { 100.0f };
 
-/* Program entry point */
+    // River
+    glColor3ub(52, 152, 219);
+    glBegin(GL_QUADS);
+    glVertex2f(-1.0f, -0.33f);
+    glVertex2f(1.0f, -0.33f);
+    glVertex2f(1.0f, -1.0f);
+    glVertex2f(-1.0f, -1.0f);
+    glEnd();
 
-int main(int argc, char *argv[])
+    // Sky
+    glColor3ub(116, 185, 255);
+    glBegin(GL_QUADS);
+    glVertex2f(-1.0f, 1.0f);
+    glVertex2f(1.0f, 1.0f);
+    glVertex2f(1.0f, -0.33f);
+    glVertex2f(-1.0f, -0.33f);
+    glEnd();
+
+    glPushMatrix();
+    glTranslatef(position, 0.0f, 0.0f);
+    glColor3ub(41, 128, 185);
+
+    // 1st wave
+    glBegin(GL_QUADS);
+    glVertex2f(1.0f, -0.33f);
+    glVertex2f(0.5f, -0.33f);
+    glVertex2f(0.5f, -0.38f);
+    glVertex2f(1.0f, -0.38f);
+    glEnd();
+
+    // 2nd wave
+    glBegin(GL_QUADS);
+    glVertex2f(0.95f, -0.38f);
+    glVertex2f(0.55f, -0.38f);
+    glVertex2f(0.55f, -0.43f);
+    glVertex2f(0.95f, -0.43f);
+    glEnd();
+
+    // 3rd wave
+    glBegin(GL_QUADS);
+    glVertex2f(0.90f, -0.43f);
+    glVertex2f(0.60f, -0.43f);
+    glVertex2f(0.60f, -0.48f);
+    glVertex2f(0.90f, -0.48f);
+    glEnd();
+
+    // 4th wave
+    glBegin(GL_QUADS);
+    glVertex2f(0.85f, -0.48f);
+    glVertex2f(0.65f, -0.48f);
+    glVertex2f(0.65f, -0.53f);
+    glVertex2f(0.85f, -0.53f);
+    glEnd();
+
+    // 5th wave
+    glBegin(GL_QUADS);
+    glVertex2f(0.80f, -0.53f);
+    glVertex2f(0.70f, -0.53f);
+    glVertex2f(0.70f, -0.58f);
+    glVertex2f(0.80f, -0.58f);
+    glEnd();
+
+    // Negative Axis
+    glTranslatef(position, 0.0f, 0.0f);
+    // 1st wave
+    glBegin(GL_QUADS);
+    glVertex2f(-1.0f, -0.33f);
+    glVertex2f(-0.5f, -0.33f);
+    glVertex2f(-0.5f, -0.38f);
+    glVertex2f(-1.0f, -0.38f);
+    glEnd();
+
+    // 2nd wave
+    glBegin(GL_QUADS);
+    glVertex2f(-0.95f, -0.38f);
+    glVertex2f(-0.55f, -0.38f);
+    glVertex2f(-0.55f, -0.43f);
+    glVertex2f(-0.95f, -0.43f);
+    glEnd();
+
+    // 3rd wave
+    glBegin(GL_QUADS);
+    glVertex2f(-0.90f, -0.43f);
+    glVertex2f(-0.60f, -0.43f);
+    glVertex2f(-0.60f, -0.48f);
+    glVertex2f(-0.90f, -0.48f);
+    glEnd();
+
+    // 4th wave
+    glBegin(GL_QUADS);
+    glVertex2f(-0.85f, -0.48f);
+    glVertex2f(-0.65f, -0.48f);
+    glVertex2f(-0.65f, -0.53f);
+    glVertex2f(-0.85f, -0.53f);
+    glEnd();
+
+    // 5th wave
+    glBegin(GL_QUADS);
+    glVertex2f(-0.80f, -0.53f);
+    glVertex2f(-0.70f, -0.53f);
+    glVertex2f(-0.70f, -0.58f);
+    glVertex2f(-0.80f, -0.58f);
+    glEnd();
+
+
+    glPopMatrix();
+
+    // Road
+glColor3ub(127, 140, 141);
+
+    glBegin(GL_QUADS);
+    glVertex2f(-1.0f, -0.165f);
+    glVertex2f(1.0f, -0.165f);
+    glVertex2f(1.0f, -0.2475f);
+    glVertex2f(-1.0f, -0.2475f);
+    glEnd();
+
+    glColor3ub(149, 165, 166);
+    glBegin(GL_QUADS);
+    glVertex2f(-1.0f, -0.2475f);
+    glVertex2f(1.0f, -0.2475f);
+    glVertex2f(1.0f, -0.33f);
+    glVertex2f(-1.0f, -0.33f);
+    glEnd();
+
+    // Grass
+    glColor3ub(46, 204, 113);
+    glBegin(GL_QUADS);
+    glVertex2f(-1.0f, -0.115f);
+    glVertex2f(1.0f, -0.115f);
+    glVertex2f(1.0f, -0.165f);
+    glVertex2f(-1.0f, -0.165f);
+    glEnd();
+
+
+    // Tree
+    drawTree(39, 174, 96, -1.0f, 0.0f);
+    drawTree(46, 204, 113, -0.81f, 0.0f);
+    drawTree(39, 174, 96, -0.61f, 0.0f);
+    drawTree(46, 204, 113, -0.41f, 0.0f);
+    drawTree(39, 174, 96, -0.21f, 0.0f);
+    drawTree(46, 204, 113, -0.01f, 0.0f);
+    drawTree(39, 174, 96, +0.21f, 0.0f);
+    drawTree(46, 204, 113, +0.41f, 0.0f);
+    drawTree(39, 174, 96, +0.61f, 0.0f);
+    drawTree(46, 204, 113, +0.81f, 0.0f);
+    drawTree(39, 174, 96, +1.0f, 0.0f);
+
+    // Car
+    glPushMatrix();
+    glTranslatef(-position, 0.0f, 0.0f);
+    drawCar();
+    glPopMatrix();
+
+    glFlush();
+}
+
+int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
-    glutInitWindowSize(640,480);
-    glutInitWindowPosition(10,10);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-
-    glutCreateWindow("GLUT Shapes");
-
-    glutReshapeFunc(resize);
+    glutInitWindowSize(1920, 1080);
+    glutCreateWindow("Smart Green City");
+    init();
     glutDisplayFunc(display);
-    glutKeyboardFunc(key);
-    glutIdleFunc(idle);
-
-    glClearColor(1,1,1,1);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-
-    glEnable(GL_LIGHT0);
-    glEnable(GL_NORMALIZE);
-    glEnable(GL_COLOR_MATERIAL);
-    glEnable(GL_LIGHTING);
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-
-    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
-
+    glutTimerFunc(100, update, 0);
     glutMainLoop();
-
-    return EXIT_SUCCESS;
+    return 0;
 }
